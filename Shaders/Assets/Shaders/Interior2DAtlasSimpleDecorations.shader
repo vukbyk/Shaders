@@ -9,7 +9,7 @@
 		_DepthScale("Depth Scale", Range(0, 2)) = .5
 
 		_DecorationRatio("Decoration ratio", Range(-5, 5)) = .5
-		_PlaceDecoration("Place Decoration", Range(0, 2)) = .5
+		_PlaceDecoration("Place Decoration", Range(0, 8)) = .5
 
 	}
 	SubShader
@@ -89,18 +89,18 @@
 				float3 k = abs(id) - pos * id;
 				float kMin = min(min(k.x, k.y), k.z);//Ovde gleda na koje zidove po osi trenutno gleda
 				pos += kMin * i.tangentViewDir;//Bez kMin dobro radi samo zidu pozadini
-
+				
 				// 0.0 - 1.0 room depth
 				float interp = pos.z * 0.5 + 0.5; // posle plus znaka mrda napred nazad texture na zidovimasa strane i podu
 
 				// account for perspective in "room" textures
 				// assumes camera with an fov of 53.13 degrees (atan(0.5))
 
-				interp = (1.0 - (1.0 / (clamp( interp , 0.0, 1.0) / depthScale + 1))) * (depthScale + 1.0);
+				interp = (1.0 - (1.0 / (clamp( interp , 0.0, 1.0) / depthScale + 1/*zoomtex*/))) * (	depthScale + 1.0);//razvlaci texturu da bude duza kako je bliza
 
 				// iterpolate from wall back to near wall
-				float2 interiorUV = pos.xy * lerp(1.0, farFrac, interp) * 0.5 + 0.5;
-
+				float2 interiorUV = pos.xy * lerp(1.0, farFrac, interp) * 0.5 + 0.5; //poslednje  dve mrdaju poziciju texture
+				// return float4 (interiorUV.x,interiorUV.y, 1.0, 1.0);
 				fixed4 roomEmpty = tex2D(_RoomTex, interiorUV.xy);
 
 
